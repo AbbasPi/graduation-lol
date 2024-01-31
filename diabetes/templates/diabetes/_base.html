@@ -1,0 +1,77 @@
+{% load static tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CGM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="{% static 'js/htmx.js' %}"></script>
+    <script src="{% static 'js/apex.js' %}"></script>
+    {% tailwind_css %}
+</head>
+<body class="bg-gray-50">
+<nav class="bg-gray-800">
+    <div class="max-w-7xl mx-auto px-8 py-4">
+        <div class="flex items-center justify-between">
+            <a href="/" class="text-white text-2xl capitalize">continuous glucose monitoring system</a>
+            <p class="text-white text-2xl capitalize">
+                {% if user.is_authenticated %}
+                    Welcome {{ user.username }}
+                {% else %}
+                    <a href="/login" class="text-white text-2xl capitalize">login</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</nav>
+{% if messages %}
+    {% for message in messages %}
+        <script>
+            const audio = new Audio('{% static 'audio/error.mp3' %}');
+                audio.play();
+        </script>
+
+        <div
+                class="font-regular relative block w-full rounded-lg bg-red-500 p-4 my-2 max-w-xl mx-auto text-base leading-5 text-white opacity-100"
+                data-dismissible="alert"
+        >
+            <div class="mr-12">{{ message }}</div>
+            <div
+                    class="absolute top-2.5 right-3 w-max rounded-lg transition-all hover:bg-white hover:bg-opacity-20"
+                    data-dismissible-target="alert"
+            >
+                <button
+                        role="button"
+                        class="w-max rounded-lg p-1"
+                        data-alert-dimissible="true"
+                >
+                    <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                    >
+                        <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                        ></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endif %}
+
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!-- recommendations.html -->
+{% extends 'diabetes/_base.html' %}
+{% load static %}
+{% block content %}
+    <div>
+        <div id="sender" hx-get="{% url 'diabetes:index' %}" hx-include="#interval" hx-swap="outerHTML"
+             hx-trigger="every {{ every }}s"
+             hx-target="body"></div>
+        <div class=" max-w-6xl justify-center items-center mx-auto mt-4">
+            <h2 class="text-center text-2xl font-bold capitalize text-gray-800">
+                Glucose Level Average for The Last <span id="last"></span> <span
+                    id="minute"></span>: {{ average_glucose_level|floatformat:.2 }} mg/dL
+            </h2>
+            <h3 class="text-center text-2xl font-bold capitalize">
+                the predicted glucose level is  <span class="text-blue-500">{{ prediction|floatformat:.2 }} mg/dL </span>
+            </h3>
+        </div>
+        {% include 'glucose_levels.html' %}
+    </div>
+    <script>
+        document.addEventListener('htmx:afterSettle', function (event) {
+            const last = document.getElementById('last');
+            const minute = document.getElementById('minute');
+            const interval = document.getElementById('interval');
+            if (interval.value > 1) {
+                minute.innerHTML = 'Minutes';
+            } else {
+                minute.innerHTML = 'Minute';
+            }
+            last.innerHTML = interval.value;
+        });
+        document.addEventListener('DOMContentLoaded', function (event) {
+            const last = document.getElementById('last');
+            const minute = document.getElementById('minute');
+            const interval = document.getElementById('interval');
+            if (interval.value > 1) {
+                minute.innerHTML = 'Minutes';
+            } else {
+                minute.innerHTML = 'Minute';
+            }
+            last.innerHTML = interval.value;
+        });
+    </script>
+{% endblock %}

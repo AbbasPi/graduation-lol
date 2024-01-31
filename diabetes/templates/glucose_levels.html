@@ -1,0 +1,93 @@
+<card id="glucose-chart-card" class="mt-6">
+    <div class="max-w-6xl mx-auto">
+            <label for="interval" class="text-left text-2xl font-bold capitalize text-gray-800">
+                Interval:
+            </label>
+            <select id="interval" name="interval" hx-target="body" hx-get="{% url 'diabetes:index' %}"
+                    class="text-center text-gray-800 border-2 border-gray-800 rounded-lg">
+                <option value="1" {% if interval == 1 %} selected {% endif %} class="text-center text-gray-800">1 Minute</option>
+                <option value="5" {% if interval == 5 %} selected {% endif %} class="text-center text-gray-800">5 Minutes</option>
+                <option value="10" {% if interval == 10 %} selected {% endif %} class="text-center text-gray-800">10 Minutes</option>
+                <option value="15" {% if interval == 15 %} selected {% endif %} class="text-center text-gray-800">15 Minutes</option>
+            </select>
+        </div>
+    <div class="max-w-6xl mx-auto bg-white shadow-md rounded mt-4" id="glucose-chart"></div>
+</card>
+<script>
+    function initApexCharts() {
+        return window.ApexCharts && (new ApexCharts(document.getElementById('glucose-chart'), {
+            series: [{
+                name: "Glucose Level",
+                data: [
+                    {% for glucose in glucose_levels %}
+                        '{{ glucose.glucose_level|floatformat:2 }}',
+                    {% endfor %}
+                ]
+            }],
+            chart: {
+                background: 'transparent',
+                height: 350,
+                type: 'line',
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                },
+                animations: {
+                    enabled: true,
+                },
+            },
+            colors: ['#1d98c4'],
+            stroke: {
+                curve: 'straight'
+            },
+            grid: {
+                show: false,
+                row: {
+                    colors: ['#f3f3f3', 'transparent'],
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: [
+                    {% for glucose in glucose_levels %}
+                        {% if not every == 5 %}
+                        '{{ glucose.minute|date:"h:i" }}',
+                        {% else %}
+                        '{{ glucose.minute|date:"h:m:s" }}',
+                        {% endif %}
+                    {% endfor %}
+                ],
+            },
+            yaxis: {
+                show: true,
+                labels: {
+                    show: true,
+                    align: 'right',
+                    style: {
+                        colors: [],
+                        fontSize: '12px',
+                        fontWeight: 400,
+                    },
+                    formatter: (value) => {
+                        return value + ' mg/dL';
+                    },
+                },
+
+            }
+        }))
+    }
+
+    document.addEventListener("DOMContentLoaded", function (evt) {
+        initApexCharts().render();
+    });
+
+
+    document.addEventListener("htmx:afterSettle", function (evt) {
+        const el = document.getElementById('glucose-chart');
+        el.innerHTML = '';
+        initApexCharts().render();
+    });
+
+</script>
